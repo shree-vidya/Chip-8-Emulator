@@ -1,1 +1,1 @@
-from .coverpages import *
+from .screens import *

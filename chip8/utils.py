@@ -8,7 +8,7 @@ import os
 
 
 class button():
-    def __init__(self, x, y, color = (0, 0, 0), width = 10, height = 10, textcolor = (255 ,255 ,255), text = '', size=60):
+    def __init__(self, x, y, file, color = (0, 0, 0), width = 100, height = 100, textcolor = (255 ,255 ,255), text = '', size=10):
         # Change constructor
         self.color = color
 
@@ -20,6 +20,7 @@ class button():
         # ----------------------------------------------
         self.text = text
         self.textcolor = textcolor
+        self.file = file
         self.size = size
 
     def draw(self, surface : Surface, outline : Optional[int] = None):

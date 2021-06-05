@@ -1,30 +1,37 @@
 """File for reusable Components"""
 
-from typing import Optional, Tuple
-from pygame import key, display, HWSURFACE, DOUBLEBUF, Color, draw, Surface, font
+from typing import Optional, Tuple, Union
+from pygame import key, display, HWSURFACE, DOUBLEBUF, Color, draw, Surface, font, mouse
 import os
 from .constants import *
 from .utils import *
+from random import randint
 
 # Size of each chip-8 pixel on computer screen
-SCALE = 5
+SCALE = 15
 
 class CoverScreen():
 
-    def __init__(self, surface : Surface, height : int = SCREENHEIGHT["normal"], width : int = SCREENWIDTH["normal"], name : str = "Chip-8 Emulator"):
+    def __init__(self, surface : Optional[Surface] = None, height : int = SCREENHEIGHT["normal"], width : int = SCREENWIDTH["normal"], name : str = "Chip-8 Emulator"):
         self.gameFiles = [i for i in os.listdir(GAMEFILEPATH) if "." not in i]
         if len(self.gameFiles) == 0:
             raise Exception("No games found")
         self.height = height
         self.width = width
-        self.surface = surface
+        self.surface = surface if surface else display.set_mode((width * SCALE, height * SCALE), HWSURFACE | DOUBLEBUF, 8)
         self.setCaption(name)
         self.clearScreen()
         display.flip()
         self.loadButtons()
 
     def loadButtons(self):
-        self.buttons = [button(1, 1, text = i) for i in self.gameFiles]
+        self.buttons = [button(10, 10, os.path.join(GAMEFILEPATH, i), text = i) for index, i in enumerate(self.gameFiles)]
+    
+    def buttonClicked(self) -> Union[str, bool]:
+        for button in self.buttons:
+            if button.isOver(mouse.get_pos()):
+                return button.file
+        return False
     
     def setCaption(self, name: str):
         display.set_caption(name)
@@ -32,7 +39,7 @@ class CoverScreen():
     def reinitialize(self):
         display.quit()
         display.init()
-        self.screen = display.set_mode((self.width * SCALE, self.height * SCALE), HWSURFACE | DOUBLEBUF, 8)
+        self.surface = display.set_mode((self.width * SCALE, self.height * SCALE), HWSURFACE | DOUBLEBUF, 8)
         self.clearScreen()
         display.flip()
 
@@ -41,7 +48,8 @@ class CoverScreen():
     
     def draw(self):
         # Draw buttons
-        pass
+        self.surface.fill(Coverpage.BACKGROUND)
+        self.buttons[0].draw(self.surface, 10)
 
     def animate(self):
         pass
@@ -62,7 +70,7 @@ class GameScreen(object):
     def reinitialize(self):
         display.quit()
         display.init()
-        self.screen = display.set_mode((self.width * SCALE, self.height * SCALE), HWSURFACE | DOUBLEBUF, 8)
+        self.surface = display.set_mode((self.width * SCALE, self.height * SCALE), HWSURFACE | DOUBLEBUF, 8)
         self.clearScreen()
         display.flip()
 
@@ -89,6 +97,9 @@ class GameScreen(object):
         self.height = SCREENHEIGHT['normal']
         self.width = SCREENWIDTH['normal']
         self.reinitialize()
+    
+    def draw(self):
+        display.flip()
 
     # def scrollDown(self, num_lines):
     #     """
